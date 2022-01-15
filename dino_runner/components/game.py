@@ -1,7 +1,9 @@
 import pygame
 
+from dino_runner.components.Obstacles.power_ups.powerup_manager import PowerUpManager
+from dino_runner.components.player_hearts.heart_manager import hearts_manager
 
-from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, RUNNING, DINODEAD
+from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, RUNNING, DINODEAD, GAME_OVER
 from dino_runner.components.dinosaurio import dinosaur
 from dino_runner.components.Obstacles.Obstacle_manager import obstacleManager
 from dino_runner.components import text_utils
@@ -21,6 +23,8 @@ class Game:
         self.y_pos_bg = 380
         self.player = dinosaur()
         self.Obstacle_manager = obstacleManager()
+        self.power_up_manager = PowerUpManager()
+        self.hearts_manager = hearts_manager()
         self.points = 0
         self.running = True
         self.death_count = 0
@@ -28,6 +32,8 @@ class Game:
     def run(self):
         # Game loop: events - update - draw
         self.Obstacle_manager.reset_obstacles()
+        self.power_up_manager.reset_power_ups(self.points,self.player)
+        self.hearts_manager.reset_counter_hearts()
         self.playing = True
         while self.playing:
             self.events()
@@ -49,6 +55,7 @@ class Game:
         user_input = pygame.key.get_pressed()
         self.player.update(user_input)
         self.Obstacle_manager.update(self)
+        self.power_up_manager.update(self.game_speed, self.player,self.points)
 
     def draw(self):
         self.screen.fill((255, 255, 255))
@@ -57,6 +64,8 @@ class Game:
         self.draw_background()
         self.player.draw(self.screen)
         self.Obstacle_manager.draw(self.screen)
+        self.power_up_manager.draw(self.screen)
+        self.hearts_manager.draw(self.screen)
         pygame.display.update()
         pygame.display.flip()
 
@@ -71,11 +80,13 @@ class Game:
 
     def score(self):
         self.points += 1
+
         if self .points % 100 == 0:
              self.game_speed += 1
 
         text,text_rect = text_utils.get_rect_score_element(self.points)
-        self.screen.blit(text,text_rect)
+        self.screen.blit(text, text_rect)
+        self.player.check_invincibility(self.screen)
 
     def print_menu_elements(self):
         half_screen_height = SCREEN_HEIGHT //2
@@ -84,17 +95,17 @@ class Game:
         if self.death_count == 0:
             text, text_rect = text_utils.get_rect_centered_message('Press any key to start')
             self.screen.blit(text, text_rect)
-            self.screen.blit(RUNNING[0], (half_screen_width - 20, half_screen_height - 140))
+            self.screen.blit(RUNNING[0], (half_screen_width - 30, half_screen_height - 140))
 
 
         else:
             text, text_rect = text_utils.get_rect_centered_message('Press any key to restart ')
             self.screen.blit(text, text_rect)
-            self.screen.blit(RUNNING[0], (half_screen_width - 20, half_screen_height - 140))
+            self.screen.blit(DINODEAD, (half_screen_width -40, half_screen_height - 200))
+            self.screen.blit(GAME_OVER, (half_screen_width - 190, half_screen_height - 250))
 
             score, score_max = text_utils.get_rect_centered_message('Points: ' +str(self.points),height = 450 )
             self.screen.blit(score, score_max)
-            self.screen.blit(DINODEAD, (half_screen_width - 20, half_screen_height - 140))
 
             scores, scores_max = text_utils.get_rect_centered_message('Death: ' +str(self.death_count),height =500)
             self.screen.blit(scores, scores_max)
