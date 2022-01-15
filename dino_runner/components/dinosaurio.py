@@ -34,11 +34,6 @@ class dinosaur (Sprite):
         self.jump_vel = self.JUMP_VEL
         #self.setup_state_booleans()
 
-    #def setup_state_booleans(self):
-        #self.has_powerup = False
-        #self.shield = False
-        #self.show_text = False
-        #self.shield_time_up =0
 
     def update(self, user_input):
         if self.dino_jump:

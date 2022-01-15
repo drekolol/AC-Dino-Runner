@@ -11,6 +11,7 @@ class Heart(Sprite):
         self.rect.x = pos_x
         self.rect.y = self.POS_Y
 
+
     def draw(self,screen):
 
         screen.blit(self.image, self.rect)

@@ -2,6 +2,7 @@ from dino_runner.components.player_hearts.hearts import Heart
 
 from dino_runner.utils.constants import HEARTS_COUNTER
 
+
 class hearts_manager:
 
     def __init__(self):
